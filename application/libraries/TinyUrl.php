@@ -1,5 +1,7 @@
 <?php
-class ShortUrl
+defined('BASEPATH') OR exit('No direct script access allowed');
+
+class TinyUrl
 {
     // string: characters used in building the tiny URL
     protected static $chars = "123456789bcdfghjkmnpqrstvwxyzBCDFGHJKLMNPQRSTVWXYZ";
@@ -49,7 +51,7 @@ class ShortUrl
         } else {
             if ($this->validateUrlFormat($url) == false) {
              $data['is_error'] = true;
-             $data['status_msg'] = "URL does not have a valid format.");
+             $data['status_msg'] = "URL does not have a valid format.";
             } else {
                 if (self::$checkUrlExists) {
                     if (!$this->verifyUrlExists($url)) {
