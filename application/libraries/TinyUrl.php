@@ -4,7 +4,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class TinyUrl
 {
     // string: characters used in building the tiny URL
-    protected static $chars = "123456789bcdfghjkmnpqrstvwxyzBCDFGHJKLMNPQRSTVWXYZ";
+    protected static $chars = "123456789abcdfghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
     // boolean: Confugurabale if URL checking is required (Y/N)
     protected static $checkUrlExists = true; 
     // store in database as created time, set when tiny URL is generated / accessed
@@ -22,8 +22,8 @@ class TinyUrl
     public function __construct()
     {
         $this->timestamp = $_SERVER["REQUEST_TIME"];
-        self::$CI = &get_instance();
-        self::$CI->load->model('urlmodel');
+        self::$CI = & get_instance();
+        self::$CI->load->model('url_model');
     }
 
 
@@ -43,8 +43,10 @@ class TinyUrl
         $sata = array();
         $data['is_error'] = false;
         $data['status_msg'] = $data['short_code'] = null;
+        $postdata = file_get_contents("php://input");
+        $postdata = json_decode($postdata, true);
 
-        $url = $this->input->post('long_url');
+        $url = isset($postdata['long_url']) ? $postdata['long_url'] : null;
         if (empty($url)) {
             $data['is_error'] = true;
             $data['status_msg'] = "No URL was supplied.";
@@ -61,9 +63,9 @@ class TinyUrl
                 }
                 if( ! $data['is_error']) {
                     if(! $shortCode = $this->urlExistsInDb($url))
-                        $data['short_code'] = $this->createShortCode($url);
+                        $data['short_code'] = base_url() . $this->createShortCode($url);
                     else
-                        $data['short_code'] = $shortCode;
+                        $data['short_code'] = base_url() . $shortCode;
                 }
             }
         }
@@ -87,7 +89,11 @@ class TinyUrl
         $sata = array();
         $data['is_error'] = false;
         $data['status_msg'] = $data['long_url'] = null;
-        $code = ($input_method = $this->input->method() == 'POST') ? $this->input->post('tiny_url') : $code;
+        if($input_method = self::$CI->input->method() == 'POST') {
+            $postdata = file_get_contents("php://input");
+            $postdata = json_decode($postdata, true);
+            $code = isset($postdata['tiny_url']) ? $postdata['tiny_url'] : null;
+        }
 
         if (empty($code)) {
             $data['status_msg'] = "No short code was supplied.";
@@ -116,12 +122,12 @@ class TinyUrl
                 } else {
                     // if first time access of tiny URL set counter to 1
                     // if accessessed tiny URL more than once update counter by 1 
-                    self::$CI->urlmodel->insertCounter($urlRow["id"], $this->timestamp);  
+                    self::$CI->url_model->incrementCounter($urlRow["id"], $this->timestamp);  
                     if($input_method != 'POST') {
-                        header('Location: ' . $urlRow["long_url"]);
+                        header('Location: ' . $urlRow["main_url"]);
                         exit;
                     } else {
-                        $data['long_url'] = $urlRow["long_url"];
+                        $data['long_url'] = $urlRow["main_url"];
                     }
                 }
             }
@@ -176,7 +182,7 @@ class TinyUrl
     */
     protected function urlExistsInDb($url) 
     {
-        $result = self::$CI->urlmodel->fetchShortCode($url);
+        $result = self::$CI->url_model->fetchShortCode($url);
         return (empty($result)) ? false : $result;
     }
 
@@ -195,9 +201,9 @@ class TinyUrl
      */
     protected function createShortCode($url) 
     {
-        $id = self::$CI->urlmodel->insertLongUrl($url, $this->timestamp);
+        $id = self::$CI->url_model->insertLongUrl($url, $this->timestamp);
         $shortCode = $this->convertIntToShortCode($id); 
-        self::$CI->urlmodel->updateShortUrl($shortCode, $id);
+        self::$CI->url_model->updateShortUrl($shortCode, $id);
         return $shortCode;
     }
 
@@ -265,7 +271,7 @@ class TinyUrl
     */
     protected function getUrlFromDb($code) 
     {
-        $result = self::$CI->urlmodel->fetchLongUrl($code);
+        $result = self::$CI->url_model->fetchLongUrl($code);
         return (empty($result)) ? false : $result;
     }
 }
