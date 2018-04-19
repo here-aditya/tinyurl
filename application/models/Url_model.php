@@ -52,7 +52,7 @@ class Url_model extends CI_Model
 		$counter = ($result->num_rows() > 0) ? $result->row()->counter : 0;
 		
 		if($counter == 0) {	
-			$insert_data = array('url_refid' => $ref_id, 'counter' => $counter, 'created_date' => $tstamp);
+			$insert_data = array('url_refid' => $ref_id, 'counter' => 1, 'created_date' => $tstamp);
 			$this->db->insert($this->counter_table, $insert_data);
 			return $this->db->insert_id() > 0 ? true : false;
 		} else {
@@ -61,5 +61,17 @@ class Url_model extends CI_Model
 			$this->db->update($this->counter_table);
 			return $this->db->affected_rows() > 0 ? true : false;
 		}
+	}
+
+	public function fetchPopular($count=1)
+	{
+		$query = $this->db->select('ut.unique_code, ct.counter')
+				->from($this->url_table . ' as ut')
+				->join($this->counter_table . ' as ct', 'ut.id = ct.url_refid', 'inner')
+				->order_by("ct.counter", "desc")
+				->limit(100)
+				->get();
+
+		return ($query->num_rows() > 0) ? $query->result() : null;
 	}
 }

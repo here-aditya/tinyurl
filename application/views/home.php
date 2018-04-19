@@ -42,13 +42,13 @@
             </h6>
             <ul class="nav flex-column mb-2">
               <li class="nav-item">
-                <a class="nav-link" href="#" ng-model="blockGenUrl" ng-init="blockGenUrl=true" ng-click="blockGenUrl= ! blockGenUrl; blockShowUrl= ! blockShowUrl">
+                <a class="nav-link" href="#" ng-model="blockGenUrl" ng-init="blockGenUrl=true" ng-click="blockGenUrl= 1; blockShowUrl= 0">
                   <span data-feather="file-text"></span>
                   Get Tiny
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#" ng-model="blockShowUrl" ng-init="blockShowUrl = false" ng-click="blockShowUrl= ! blockShowUrl; blockGenUrl= ! blockGenUrl">
+                <a class="nav-link" href="#" ng-model="blockShowUrl" ng-init="blockShowUrl = false" ng-click="blockShowUrl= 1; blockGenUrl= 0">
                   <span data-feather="file-text"></span>
                   Show Tiny
                 </a>
@@ -107,10 +107,13 @@
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td>1,001</td>
-                  <td>Lorem</td>
-                  <td>0</td>
+                <tr ng-repeat="record in tbl_records"">
+                  <td>{{$index+1}}</td>
+                  <td><a href="{{record.link}}" target="_blank">{{record.link}}</a></td>
+                  <td>{{record.counter}}</td>
+                </tr>
+                <tr ng-show="tbl_records.lenght == 0">
+                	<td>NO RECORDS FOUND</td>
                 </tr>
               </tbody>
             </table>
