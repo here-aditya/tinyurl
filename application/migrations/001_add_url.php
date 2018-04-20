@@ -31,6 +31,7 @@ class Migration_Add_url extends CI_Migration
                         )
                 ));
                 $this->dbforge->add_key('id', TRUE);
+                 // create index on field index_short_code
                 $this->dbforge->add_key('unique_code');
                 $attributes = array('ENGINE' => 'InnoDB');
                 $this->dbforge->create_table('tiny_urls', TRUE, $attributes);
