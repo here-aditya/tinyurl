@@ -48,7 +48,7 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#" ng-model="blockShowUrl" ng-init="blockShowUrl = false" ng-click="blockShowUrl= 1; blockGenUrl= 0">
+                <a class="nav-link" href="#" ng-model="blockShowUrl" ng-init="blockShowUrl = false" ng-click="blockShowUrl= 1; blockGenUrl= 0; initGetPopular();">
                   <span data-feather="file-text"></span>
                   Show Tiny
                 </a>
@@ -112,8 +112,8 @@
                   <td><a href="{{record.link}}" target="_blank">{{record.link}}</a></td>
                   <td>{{record.counter}}</td>
                 </tr>
-                <tr ng-show="tbl_records.lenght == 0">
-                	<td>NO RECORDS FOUND</td>
+                <tr ng-show="tbl_records==null">
+                	<td colspan="3">No records found.</td>
                 </tr>
               </tbody>
             </table>

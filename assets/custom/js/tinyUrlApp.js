@@ -29,7 +29,6 @@ app.controller("tinyUrlCtrl", ['$scope', '$http', function ($scope, $http) {
 			 } else {
 			 	$scope.frm.is_ok = 'success';
 			 	$scope.frm.tiny_url = response.data.short_code;
-			 	$scope.initGetPopular();
 			 }
         });
     }

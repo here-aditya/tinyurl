@@ -4,7 +4,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class TinyUrl
 {
     // string: characters used in building the tiny URL
-    protected static $chars = "123456789abcdfghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    protected static $chars = "0123456789abcdfghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
     // boolean: Confugurabale if URL checking is required (Y/N)
     protected static $checkUrlExists = true; 
     // store in database as created time, set when tiny URL is generated / accessed
@@ -212,41 +212,24 @@ class TinyUrl
     * Convert an integer to a short code.
     * 
     * This method does the actual conversion of the ID integer to a short code.
-    * If successful, it returns the created code. If there is an error, an
-    * exception is thrown.
+    * If successful, it returns the created code. 
     * 
     * @param int $id the integer to be converted
     * @return string the created short code
-    * @throws Exception if an error occurs
     */
     protected function convertIntToShortCode($id) 
     {
-        $id = intval($id);
-        if ($id < 1) {
-            throw new \Exception("The ID is not a valid integer");
+        return strtr(rtrim(base64_encode(pack('i', $id)), '='), '+/', '-_');
+
+        //we could also this functionality to generate short code
+        /*$base = strlen(self::$chars);
+        $shortcode = "";
+        while ($id > 0) {
+          $shortcode = substr(self::$chars, ($id % $base), 1) . $shortcode;
+          $id = floor($id / $base);
         }
-
-        $length = strlen(self::$chars);
-        // least 10 characters
-        if ($length < 10) {
-            throw new \Exception("Length of chars is too small");
-        }
-
-        $code = "";
-        while ($id > $length - 1) {
-            // determine the value of the next higher character
-            // in the short code should be and prepend
-            $code = self::$chars[fmod($id, $length)] . $code;
-            // reset $id to remaining value to be converted
-            $id = floor($id / $length);
-        }
-
-        // remaining value of $id is less than the length of self::$chars
-        $code = self::$chars[$id] . $code;
-
-        return $code;
+        return base64_encode($shortcode);*/
     }
-
 
     /**
     * Check to see if the supplied short code is a valid format
